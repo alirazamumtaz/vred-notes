@@ -17,3 +17,4 @@ gives
 $$
 F(x) = \int^a_b \frac{1}{2}x^4
 $$
+Edited by ali raza
