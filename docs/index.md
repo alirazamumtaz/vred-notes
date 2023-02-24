@@ -14,9 +14,9 @@ Vulnerability research and exploit development are processes used by security pr
 5. [ReverseEngingeering](5.%20Reverse%20Engineering.md)
 6. [MemoryErrors](6.%20Memory%20Errors.md)
 7. [Race Condition](7.%20Race%20Condtion.md)
-8. [KernelSecurtiy](9.%20Kernel%20Security.md)
-9. [Dynamic Allocator Misuses](8.%20Dynamic%20Allocators.md)
+8. [Dynamic Allocator Misuses](8.%20Dynamic%20Allocators.md)
 
 ### Kernel Exploitation
 
-1. [Kernel-Rop](Kernel%20Rop.md) 
+1. [KernelSecurtiy](1.%20Kernel%20Security.md)
+2. [Kernel-Rop](Kernel%20Rop.md) 
