@@ -1,0 +1,561 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="../5.%20Reverse%20Engineering/" rel="prev"/>
+<link href="../7.%20Race%20Condtion/" rel="next"/>
+<link href="../../assets/images/favicon.png" rel="icon"/>
+<meta content="mkdocs-1.4.2, mkdocs-material-9.0.14" name="generator"/>
+<title>6. Memory Errors - obsidian-mkdocs template</title>
+<link href="../../assets/stylesheets/main.113286f1.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/palette.a0c5b2b5.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="pink" data-md-color-scheme="default" dir="ltr">
+<script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#memory-corruptions">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="obsidian-mkdocs template" class="md-header__button md-logo" data-md-component="logo" href="../.." title="obsidian-mkdocs template">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            obsidian-mkdocs template
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              6. Memory Errors
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="pink" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path></svg>
+</label>
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="blue" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="pink" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"></path></svg>
+</label>
+</form>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="obsidian-mkdocs template" class="md-nav__button md-logo" data-md-component="logo" href="../.." title="obsidian-mkdocs template">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"></path></svg>
+</a>
+    obsidian-mkdocs template
+  </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../..">
+        Vulnerability Research and Exploit Development
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../Kernel%20Rop/">
+        Kernel Rop
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          1. VRED
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="true" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+          1. VRED
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../1.%20Process%20in%20Linux/">
+        1. Process in Linux
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../2.%20Assembly/">
+        2. Assembly
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../3.%20Shellcode%20Injection/">
+        3. Shellcode Injection
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../4.%20Sandboxing/">
+        4. Sandboxing
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../5.%20Reverse%20Engineering/">
+        5. Reverse Engineering
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
+          6. Memory Errors
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+        6. Memory Errors
+      </a>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#memory-corruptions">
+    Memory Corruptions
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#problems-with-c">
+    Problems with C
+  </a>
+<nav aria-label="Problems with C" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#trusting-the-developers">
+    Trusting the Developers
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mixing-the-control-information-with-user-data">
+    Mixing the Control Information with User Data.
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mixing-data-with-meta-data">
+    Mixing Data with Meta Data
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#cleanup-problem">
+    Cleanup Problem
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#causes-of-corruption">
+    Causes of Corruption
+  </a>
+<nav aria-label="Causes of Corruption" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#classic-bufferoverflow">
+    Classic Bufferoverflow
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#signedness-mixup">
+    Signedness Mixup
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#stack-canaries">
+    Stack Canaries
+  </a>
+<nav aria-label="Stack Canaries" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#by-passing-the-canary">
+    By-Passing the canary.
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#address-space-layout-randomization">
+    Address Space Layout Randomization
+  </a>
+<nav aria-label="Address Space Layout Randomization" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#page-alignment">
+    Page-Alignment
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../7.%20Race%20Condtion/">
+        7. Race Condtion
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../8.%20Dynamic%20Allocators/">
+        8. Dynamic Allocators
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          2. Kernel Security
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+          2. Kernel Security
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../2.%20Kernel%20Security/1.%20Kernel%20Security/">
+        1. Kernel Security
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../2.%20Kernel%20Security/2.%20KPTI/">
+        2. KPTI
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#memory-corruptions">
+    Memory Corruptions
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#problems-with-c">
+    Problems with C
+  </a>
+<nav aria-label="Problems with C" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#trusting-the-developers">
+    Trusting the Developers
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mixing-the-control-information-with-user-data">
+    Mixing the Control Information with User Data.
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mixing-data-with-meta-data">
+    Mixing Data with Meta Data
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#cleanup-problem">
+    Cleanup Problem
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#causes-of-corruption">
+    Causes of Corruption
+  </a>
+<nav aria-label="Causes of Corruption" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#classic-bufferoverflow">
+    Classic Bufferoverflow
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#signedness-mixup">
+    Signedness Mixup
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#stack-canaries">
+    Stack Canaries
+  </a>
+<nav aria-label="Stack Canaries" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#by-passing-the-canary">
+    By-Passing the canary.
+  </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#address-space-layout-randomization">
+    Address Space Layout Randomization
+  </a>
+<nav aria-label="Address Space Layout Randomization" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#page-alignment">
+    Page-Alignment
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1>6. Memory Errors</h1>
+<hr/>
+<p>In the early days of computing, programmers would write machine code by hand, using a series of switches or a punched card or paper tape to represent the ones and zeros. This was a time-consuming and error-prone process, and it required a deep understanding of the underlying hardware and architecture of the computer.</p>
+<p>Over time, higher-level programming languages were developed that allowed programmers to write code in a more abstract, human-readable form. These languages are translated into machine code by a compiler or interpreter before they can be run on a computer.</p>
+<p>Dennis Ritchie developed C in 1972 with the goal of creating a programming language that was portable across different computer architectures and provided developers with low-level control over memory access. C is known for its close mapping to assembly language and its ability to effectively execute without many runtime surprises.</p>
+<h3 id="memory-corruptions">Memory Corruptions<a class="headerlink" href="#memory-corruptions" title="Permanent link">¶</a></h3>
+<hr/>
+<p>Memory corruption occurs when a program writes data to memory in an unintended way, often resulting in errors or vulnerabilities in the system. The idea of memory isolation between processes, as proposed by Graham et al., was an important step in addressing these concerns by limiting the ability of one process to access or modify the memory of another process. This helps to prevent malicious or poorly written programs from causing unintended consequences on the system. Memory isolation is an important concept in modern operating systems and is used to improve security and prevent data corruption.</p>
+<h3 id="problems-with-c">Problems with C<a class="headerlink" href="#problems-with-c" title="Permanent link">¶</a></h3>
+<hr/>
+<h5 id="trusting-the-developers">Trusting the Developers<a class="headerlink" href="#trusting-the-developers" title="Permanent link">¶</a></h5>
+<p>In Python:</p>
+<pre><code class="language-python">a = [ 1, 2, 3 ]
+print a[10] = 0x41;
+#IndexError: list index out of range
+</code></pre>
+<p>In C:</p>
+<pre><code class="language-c">int a[3] = { 1, 2, 3 };
+ a[10] = 0x41;
+  // no problem!
+</code></pre>
+<p>In the Python code snippet, when the developer attempts to access the 11th element in the list <code>a</code> using the index <code>10</code>, they receive an <code>IndexError</code> because the list only has 3 elements and the index is out of range. This is a built-in safety mechanism in Python that prevents developers from accidentally accessing or modifying elements that do not exist in the list.</p>
+<p>On the other hand, in the C code snippet, the developer is able to assign the value <code>0x41</code> to the 11th element of the array <code>a</code> without any error or exception being thrown. This is because C does not have built-in bounds checking for arrays, and the developer is responsible for ensuring that they do not access or modify elements that are out of range.</p>
+<p>If the developer attempts to access or modify an element that is out of range in C, the program will continue to execute and the result will depend on the specific behavior of the underlying hardware and operating system. This can lead to unpredictable or unintended consequences, such as data corruption or a crash.</p>
+<p>Therefore, one issue with using C is that developers must be careful to ensure that they do not access or modify elements that are out of range, as there is no built-in protection against this type of error. In contrast, languages like Python provide built-in mechanisms to prevent such errors and protect against memory corruption.</p>
+<h4 id="mixing-the-control-information-with-user-data">Mixing the Control Information with User Data.<a class="headerlink" href="#mixing-the-control-information-with-user-data" title="Permanent link">¶</a></h4>
+<hr/>
+<p>When a program starts up, it may have data that has been influenced by the user already present. This data may come from a variety of sources, such as user input, configuration files, or command line arguments. This user-influenced data is often stored in variables and used by the program during execution.</p>
+<p><img alt="Image 1" src="Pasted-image-20221221221845.png"/></p>
+<p>As the program executes, this user data can spread throughout the program and be used in various parts of the code. However, it is important to ensure that user data does not directly control program execution. This is because user data is considered "non-control" data and should not be used to determine the flow of the program.</p>
+<p><img alt="Image 2" src="Pasted-image-20221221221928.png"/></p>
+<p>However, user data is often stored in the same memory as "control" data, which is data that determines the flow of the program. This can create vulnerabilities if the user data is not properly validated or sanitized before being used. For example, if user data is used to determine the size of an array, an attacker could potentially manipulate the user data to create a buffer overflow or other type of memory corruption.</p>
+<p>To prevent these types of vulnerabilities, it is important to properly validate and sanitize user data before using it in the program and to carefully separate control data from non-control data in memory.</p>
+<p><img alt="Image 3" src="Pasted-image-20221221221949.png"/></p>
+<p>In C, the stack is a region of memory that stores various types of data related to the current function and its calling functions. This data can include local variables, pointers to other locations in the stack or in memory, and pointers to code (return addresses). All of this data is stored together in the stack and treated in the same way. If a user is able to overwrite control data, such as a return address, they can use this to redirect the control flow of the program elsewhere or on the stack containing our shellcode.</p>
+<pre><code class="language-c">int a[3] = { 1, 2, 3 };
+a[10] = 0x41;
+</code></pre>
+<p>For example, in the C code snippet provided, the array <code>a</code> and its elements are stored on the stack along with other data, such as local variables and pointers. When the developer attempts to assign the value <code>0x41</code> to the 11th element of the array <code>a</code>, this operation is performed on the stack without any bounds checking. As a result, it is possible for the developer to access or modify elements that are out of range, which can lead to unpredictable or unintended consequences.</p>
+<h4 id="mixing-data-with-meta-data">Mixing Data with Meta Data<a class="headerlink" href="#mixing-data-with-meta-data" title="Permanent link">¶</a></h4>
+<hr/>
+<p>In C, strings are typically represented as arrays of characters that are terminated with a NULL byte. For example, the code snippet declares a character array <code>name</code> of size 10 and initializes it with the string "Yan". This means that the <code>name</code> array will hold 10 bytes in memory, with the first 3 bytes containing the characters 'Y', 'a', and 'n', and the remaining 7 bytes initialized to NULL. The NULL byte at the end of the string serves as a terminator and implicitly encodes the length of the string data.</p>
+<pre><code class="language-c">char name[10] = "Yan";
+read(0, name, sizeof(name));
+</code></pre>
+<p>If the <code>read</code> function is called with the third argument being <code>sizeof(name)</code>, it will read up to 10 bytes from the input and store them in the <code>name</code> array. If there are NULL bytes in the input, they will be stored in the <code>name</code> array along with the other characters and will not terminate the string.</p>
+<p>On the other hand, if there are no NULL bytes in the input, the <code>read</code> function will continue to read and store characters until it reaches the end of the input or the maximum number of bytes specified (in this case, 10). If the input is longer than 10 bytes, the <code>read</code> function will start storing characters starting from the address where the name is stored in memory and eventually overwrite the NULL byte required in string by C standards.</p>
+<h4 id="cleanup-problem">Cleanup Problem<a class="headerlink" href="#cleanup-problem" title="Permanent link">¶</a></h4>
+<hr/>
+<p>In C, it is the responsibility of the developer to manage memory and other resources during the execution of a program. This includes properly initializing and releasing resources to prevent resource leaks. If these tasks are not performed correctly, the program may suffer from performance degradation or even failure.</p>
+<pre><code class="language-c">void my_function()  
+{
+    char my_variable[8];
+}
+// what is the value of my_variable here?
+</code></pre>
+<p>For example, in the code snippet provided, the variable <code>my_variable</code> is declared as an array of characters with size 8. However, the value of <code>my_variable</code> is not initialized at the time it is declared. This means that the contents of the <code>my_variable</code> array are undefined and may contain any values. It is the responsibility of the developer to initialize the <code>my_variable</code> array to a known state before using it in the program.
+In general, it is important to carefully consider resource management in C and to properly initialize and release resources to prevent resource leaks and ensure the proper functioning of the program.</p>
+<h3 id="causes-of-corruption">Causes of Corruption<a class="headerlink" href="#causes-of-corruption" title="Permanent link">¶</a></h3>
+<hr/>
+<h4 id="classic-bufferoverflow">Classic Bufferoverflow<a class="headerlink" href="#classic-bufferoverflow" title="Permanent link">¶</a></h4>
+<p>In the C programming language, the programmer is responsible for managing the size of buffers, which are blocks of memory used to store data. This means that it is up to the programmer to ensure that the amount of data written to a buffer does not exceed its capacity. If a buffer is not large enough to hold the data being written to it, the data may overwrite adjacent memory, potentially leading to unpredictable behavior or even a crash.</p>
+<pre><code class="language-c">int main(int argc, char **argv, char **envp) { char small_buffer[16]; read(0, small_buffer, 128); }
+</code></pre>
+<p>In the example provided, the small_buffer array has a size of 16 bytes. However, the read function is attempting to read in 128 bytes of data from the standard input stream into this buffer. Since the small_buffer array is not large enough to hold this much data, any data beyond the 16th byte will overwrite other memory. This can lead to problems if the overwritten memory is being used by the program for some other purpose.</p>
+<p>To avoid this issue, the programmer should ensure that the size of the buffer is sufficient to hold the data being written to it. In this case, the small_buffer array should be at least 128 bytes in size to safely hold the data being read from the input stream.</p>
+<h4 id="signedness-mixup">Signedness Mixup<a class="headerlink" href="#signedness-mixup" title="Permanent link">¶</a></h4>
+<pre><code class="language-c">int main() 
+{
+
+int size;
+
+  char buf[16];
+
+  scanf("%i", &amp;size);
+
+  if (size &gt; 16) exit(1);
+
+  read(0, buf, size);
+
+  }
+</code></pre>
+<p>In the example provided, the size variable is an integer, which is a signed type in the C programming language. However, the read function and other similar functions in the standard C library use unsigned integers for sizes. This means that if size is a negative value, it will be treated as a large positive value when passed as an argument to these functions.</p>
+<p>This can lead to problems if the value of size is intended to be used as a limit on the amount of data being read or copied. For example, if size is negative, the read function will attempt to read a large amount of data into the buf array, potentially causing a buffer overflow or other unexpected behavior.</p>
+<p>To avoid this issue, the programmer should ensure that size is a non-negative value before calling functions that expect unsigned integer sizes. In this case, the code could include a check to ensure that size is greater than or equal to zero before calling the read function. Alternatively, the size variable could be defined as an unsigned integer to match the expected type of the read function.</p>
+<h3 id="stack-canaries">Stack Canaries<a class="headerlink" href="#stack-canaries" title="Permanent link">¶</a></h3>
+<p>Buffer overflows occur when a program attempts to write more data to a buffer than it can hold, causing the excess data to overwrite adjacent memory locations. One type of buffer overflow attack involves overwriting the return address of a function on the call stack, which can allow an attacker to execute arbitrary code or gain unauthorized access to a system.</p>
+<p>To defend against this type of attack, researchers introduced a technique known as stack canaries. A stack canary is a random value that is placed at the end of the stack frame for a function before the function is called. When the function returns, the value of the stack canary is checked to ensure that it has not been modified. If the stack canary has been modified, it is likely that a buffer overflow has occurred, and the program can terminate or take other appropriate action.</p>
+<p>The use of stack canaries can help to prevent buffer overflow attacks by making it more difficult for an attacker to control the return address of a function. However, it is important to note that stack canaries can be bypassed in some cases, and they should not be relied upon as the sole means of defense against buffer overflow attacks. Other techniques, such as stack protection and address space layout randomization, may also be used to enhance security.</p>
+<p>Here is Example:</p>
+<pre><code class="language-asm">   0x0000000000001175 &lt;+0&gt;:     push   rbp
+   0x0000000000001176 &lt;+1&gt;:     mov    rbp,rsp
+   0x0000000000001179 &lt;+4&gt;:     add    rsp,0xffffffffffffff80
+   0x000000000000117d &lt;+8&gt;:     mov    DWORD PTR [rbp-0x74],edi
+   0x0000000000001180 &lt;+11&gt;:    mov    QWORD PTR [rbp-0x80],rsi
+   0x0000000000001184 &lt;+15&gt;:    mov    rax,QWORD PTR fs:0x28 /*canary... fetch*/
+   0x000000000000118d &lt;+24&gt;:    mov    QWORD PTR [rbp-0x8],rax/*saving canary on stack*/
+   0x0000000000001191 &lt;+28&gt;:    xor    eax,eax
+   0x0000000000001193 &lt;+30&gt;:    mov    eax,0x0
+   0x0000000000001198 &lt;+35&gt;:    call   0x1139 &lt;fun&gt;
+   0x000000000000119d &lt;+40&gt;:    mov    eax,0x0
+   0x00000000000011a2 &lt;+45&gt;:    mov    rdx,QWORD PTR [rbp-0x8]
+   0x00000000000011a6 &lt;+49&gt;:    sub    rdx,QWORD PTR fs:0x28/*checking canary*/
+   0x00000000000011af &lt;+58&gt;:    je     0x11b6 &lt;main+65&gt;
+   0x00000000000011b1 &lt;+60&gt;:    call   0x1030 &lt;__stack_chk_fail@plt&gt;/*if failed*/
+   0x00000000000011b6 &lt;+65&gt;:    leave
+   0x00000000000011b7 &lt;+66&gt;:    ret
+</code></pre>
+<h5 id="by-passing-the-canary">By-Passing the canary.<a class="headerlink" href="#by-passing-the-canary" title="Permanent link">¶</a></h5>
+<p>There are several methods that can be used to bypass stack canaries in certain situations. One method is to use another vulnerability in the program to leak the value of the stack canary. This can allow an attacker to determine the value of the canary and use it to construct a buffer overflow attack that bypasses the canary check.</p>
+<p>Another method is to brute-force the canary by forking processes repeatedly until the correct value is found. This can be done by repeatedly calling the fork function, which creates a copy of the current process, and waiting for the child process to return. If the child process returns successfully, it means that the canary has not been modified and the value can be determined.</p>
+<p>A third method is to jump the canary by overwriting the value of a variable in the stack frame and redirecting the flow of execution to a location after the canary. This can be done if the layout of the stack allows the value of the variable to be controlled by an attacker.</p>
+<p>It is important to note that stack canaries are an effective security mechanism in general, but they can be bypassed in certain situations. Other techniques, such as stack protection and address space layout randomization, may also be used to enhance security.</p>
+<h4 id="address-space-layout-randomization">Address Space Layout Randomization<a class="headerlink" href="#address-space-layout-randomization" title="Permanent link">¶</a></h4>
+<p>ASLR is a security mechanism that randomizes the locations of code and data in memory, making it more difficult for an attacker to predict the location of specific pointers or other data in memory.</p>
+<p>With ASLR, an attacker who corrupts a pointer may not be able to predict where it will point, making it more difficult to successfully execute an attack. For example, if the attacker corrupts a pointer to point to malicious code, the code may not be located at the expected address due to ASLR, and the attack will fail.</p>
+<p>Overall, ASLR can help to increase the security of a system by making it more difficult for attackers to successfully execute memory corruption attacks. However, it is important to note that ASLR is not a foolproof defense, and it should be used in conjunction with other security measures to provide the best protection against memory corruption attacks.</p>
+<p>There are several methods that can be used to bypass ASLR in certain situations.</p>
+<p>One method is to leak the addresses of program assets, such as code or data, out of the program. This can be done by using another vulnerability in the program to disclose the addresses, such as a buffer overflow or information leakage vulnerability. While ASLR can make it more difficult for an attacker to predict the location of specific assets, the assets still have to be in memory in order for the program to access them. Therefore, an attacker who is able to leak the addresses of assets can use this information to construct a successful memory corruption attack.</p>
+<p>Another method is to overwrite just the page offset of program assets. Program assets are typically page-aligned in memory, meaning that they are located at addresses that are multiples of the page size. By overwriting the page offset, an attacker can potentially redirect the flow of execution to a different asset that is located on the same page. This method may require some brute-forcing to find the correct page offset.</p>
+<p>A third method is to brute-force the addresses of program assets by forking processes repeatedly and checking the location of assets in each child process. This can be done by repeatedly calling the fork function, which creates a copy of the current process, and examining the location of assets in each child process. While this method may be effective in some cases, it can be time-consuming and may not be practical for larger programs with many assets.</p>
+<p>Overall, ASLR is an effective security mechanism for defending against memory corruption attacks, but it can be bypassed in certain situations. It is important to use a combination of security measures to provide the best protection against these types of attacks.</p>
+<h5 id="page-alignment">Page-Alignment<a class="headerlink" href="#page-alignment" title="Permanent link">¶</a></h5>
+<p>In computer systems, memory is typically divided into pages, which are blocks of contiguous memory that are typically 4,096 bytes (0x1000) in size. Pages are typically aligned to addresses that are multiples of the page size, meaning that the least significant bits of the address are always zero.</p>
+<p>For example, if a page is 4,096 bytes in size, its possible addresses would be 0x0000, 0x1000, 0x2000, and so on. This means that the last three nibbles (4 bits) of an address are never changed, and the only variable portion of the address is the first nibble.</p>
+<p>If an attacker wants to redirect a pointer to another location on the same page, they can overwrite the two least significant bytes of the pointer. With little endian byte ordering, these are the first two bytes of the pointer. By overwriting these two bytes, the attacker can redirect the pointer to any address within the same page, requiring only a brute-force search of 16 possible values (one nibble) to find a valid address.</p>
+<p>It is important to note that this method of bypassing ASLR is only effective if the attacker can control the two least significant bytes of a pointer. In other cases, a more extensive brute-force search may be required to find a valid address. Additionally, this method may not be effective if the target program uses other security measures, such as stack canaries or non-executable stacks, to defend against memory corruption attacks.</p>
+<blockquote>
+<p>[!Note]
+The Brute-Force technique works in netwrok based application and it can work in android since all the processes in android are spawned throug the single main process</p>
+</blockquote>
+<p>Further Reading : 
+- https://www.mdpi.com/2076-3417/12/13/6702
+- Read About <a href="../3.%20Shellcode%20Injection/">3. Shellcode Injection</a> to overwrite the return address after bypassing these mitigation techniques</p>
+</article>
+</div>
+</div>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+<script src="../../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+<script src="../../javascripts/mathjax.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</body>
+</html>
