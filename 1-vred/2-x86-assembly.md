@@ -14,11 +14,11 @@ Several general purpose registers:
     #### Register Partial Access
 Registers can be accessed partially, meaning that you can access the least significant bytes or most significant bytes of a word in a register. This can be useful for setting specific bits, or for reading and writing data from certain areas of the register.
 
-Accessing eax will sign-extend out the rest of rax. Other partial access preserve untouched parts of the register.  ![Image 1](Capture1.png)
+Accessing eax will sign-extend out the rest of rax. Other partial access preserve untouched parts of the register.  ![Image [1](../images/Capture1.png)
 
 #### All partial accesses on amd64
 
-![Image 2](Capture2.PNG)
+![Image 2](../images/Capture2.PNG)
 
 ## Assembly Instruction
 A general assembly instruction format looks like : `OPCODE OPERAND OPERAND`
@@ -44,13 +44,11 @@ System calls (on amd64) are triggered by:
 The following assembly code that uses the `read` system call to read from the standard input (file descriptor 0) into a buffer in memory.
 
 ```
-
 mov rdi, 0          # Set file descriptor (0 for stdin)
 mov rsi, buffer     # Set buffer address
 mov rdx, 100        # Set number of bytes to read
 mov eax, 0          # Set system call number (0 for read)
 syscall             # Make the system call
-
 ```
 
 ### Function calling conventions
