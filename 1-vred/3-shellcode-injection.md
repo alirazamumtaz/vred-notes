@@ -50,10 +50,8 @@ As mentioned above, Usually the goal of an exploit is to achieve arbitrary comma
 - Writing your own shellcode (normally in assembly)
 
 - Using publicly available shellcodes
-
-- https://www.exploit-db.com/shellcodes
-
-- https://shell-storm.org/shellcode/index.html
+	- https://www.exploit-db.com/shellcodes
+	- https://shell-storm.org/shellcode/index.html
 
 - Generating shellcode using tools like `msfvenom`
 
