@@ -14,7 +14,8 @@ Several general purpose registers:
     #### Register Partial Access
 Registers can be accessed partially, meaning that you can access the least significant bytes or most significant bytes of a word in a register. This can be useful for setting specific bits, or for reading and writing data from certain areas of the register.
 
-Accessing eax will sign-extend out the rest of rax. Other partial access preserve untouched parts of the register.  ![Image ![Image 1](../images/Capture1.png)
+Accessing eax will sign-extend out the rest of rax. Other partial access preserve untouched parts of the register.
+![Image 1](../images/Capture1.PNG)
 
 #### All partial accesses on amd64
 
@@ -26,10 +27,10 @@ A general assembly instruction format looks like : `OPCODE OPERAND OPERAND`
 #### Data manipulation instructions
 Instructions can move and manipulate data in registers and memory
 
-    MOV  : Move data from one location to another
-    PUSH : Push a value onto the stack
-    POP  : Pop a value from the stack
-    LEA  : Load the address of a memory location
+- `MOV`  : Move data from one location to another
+- `PUSH`: Push a value onto the stack
+- `POP`  : Pop a value from the stack
+- `LEA`  : Load the address of a memory location
 
 #### Control Flow instruction
 Control flow is determined by conditional and unconditional jumps.
@@ -58,4 +59,5 @@ In x86_64 architecture, arguments are passed on stack in reverse order and remai
 
 - Callee-saved (Caller owned) registers, on the other hand, are expected to be preserved by the called function and restored to their original values before returning control to the calling function if the callee wants to use them. The callee-saved registers in the x86-64 architecture are: `rbx`,`rbp`,`r12` to `r15`
 
->It is important to note that these conventions are not enforced by the hardware, but are followed as a matter of convention to ensure compatibility between functions. A function can modify any register it wishes, but it is generally considered good practice to follow the caller-saved/callee-saved conventions to avoid unexpected behavior.
+> 💡
+> It is important to note that these conventions are not enforced by the hardware, but are followed as a matter of convention to ensure compatibility between functions. A function can modify any register it wishes, but it is generally considered good practice to follow the caller-saved/callee-saved conventions to avoid unexpected behavior.
