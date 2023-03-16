@@ -1,4 +1,3 @@
-<hr>
 
 In the early days of computing, programmers would write machine code by hand, using a series of switches or a punched card or paper tape to represent the ones and zeros. This was a time-consuming and error-prone process, and it required a deep understanding of the underlying hardware and architecture of the computer.
 
@@ -8,17 +7,14 @@ Dennis Ritchie developed C in 1972 with the goal of creating a programming langu
 
 ### Memory Corruptions
 
-<hr>
-
 Memory corruption occurs when a program writes data to memory in an unintended way, often resulting in errors or vulnerabilities in the system. The idea of memory isolation between processes, as proposed by Graham et al., was an important step in addressing these concerns by limiting the ability of one process to access or modify the memory of another process. This helps to prevent malicious or poorly written programs from causing unintended consequences on the system. Memory isolation is an important concept in modern operating systems and is used to improve security and prevent data corruption.
 
 ### Problems with C
 
-<hr>
 
 ##### Trusting the Developers
 
-In Python:
+_In Python_:
 
 ```python
 a = [ 1, 2, 3 ]
@@ -26,7 +22,7 @@ print a[10] = 0x41;
 #IndexError: list index out of range
 ```
 
-In C:
+_In C_:
 
 ```c
 int a[3] = { 1, 2, 3 };
@@ -44,21 +40,21 @@ Therefore, one issue with using C is that developers must be careful to ensure t
 
 #### Mixing the Control Information with User Data.
 
-<hr>
+ 
 
 When a program starts up, it may have data that has been influenced by the user already present. This data may come from a variety of sources, such as user input, configuration files, or command line arguments. This user-influenced data is often stored in variables and used by the program during execution.
 
-![Image 1](Pasted-image-20221221221845.png)
+![Image 1](../images/Pasted-image-20221221221845.png)
 
 As the program executes, this user data can spread throughout the program and be used in various parts of the code. However, it is important to ensure that user data does not directly control program execution. This is because user data is considered "non-control" data and should not be used to determine the flow of the program.
 
-![Image 2](Pasted-image-20221221221928.png)
+![Image 2](../images/Pasted-image-20221221221928.png)
 
 However, user data is often stored in the same memory as "control" data, which is data that determines the flow of the program. This can create vulnerabilities if the user data is not properly validated or sanitized before being used. For example, if user data is used to determine the size of an array, an attacker could potentially manipulate the user data to create a buffer overflow or other type of memory corruption.
 
 To prevent these types of vulnerabilities, it is important to properly validate and sanitize user data before using it in the program and to carefully separate control data from non-control data in memory.
 
-![Image 3](Pasted-image-20221221221949.png)
+![Image 3](../images/Pasted-image-20221221221949.png)
 
 
 In C, the stack is a region of memory that stores various types of data related to the current function and its calling functions. This data can include local variables, pointers to other locations in the stack or in memory, and pointers to code (return addresses). All of this data is stored together in the stack and treated in the same way. If a user is able to overwrite control data, such as a return address, they can use this to redirect the control flow of the program elsewhere or on the stack containing our shellcode.
@@ -72,7 +68,7 @@ For example, in the C code snippet provided, the array `a` and its elements are 
 
 #### Mixing Data with Meta Data
 
-<hr>
+ 
 
 In C, strings are typically represented as arrays of characters that are terminated with a NULL byte. For example, the code snippet declares a character array `name` of size 10 and initializes it with the string "Yan". This means that the `name` array will hold 10 bytes in memory, with the first 3 bytes containing the characters 'Y', 'a', and 'n', and the remaining 7 bytes initialized to NULL. The NULL byte at the end of the string serves as a terminator and implicitly encodes the length of the string data.
 
@@ -87,7 +83,7 @@ On the other hand, if there are no NULL bytes in the input, the `read` function 
 
 #### Cleanup Problem
 
-<hr>
+ 
 
 In C, it is the responsibility of the developer to manage memory and other resources during the execution of a program. This includes properly initializing and releasing resources to prevent resource leaks. If these tasks are not performed correctly, the program may suffer from performance degradation or even failure.
 
@@ -102,7 +98,7 @@ For example, in the code snippet provided, the variable `my_variable` is declare
 In general, it is important to carefully consider resource management in C and to properly initialize and release resources to prevent resource leaks and ensure the proper functioning of the program.
 
 ### Causes of Corruption
-<hr>
+ 
 
 #### Classic Bufferoverflow
 
@@ -151,7 +147,7 @@ The use of stack canaries can help to prevent buffer overflow attacks by making 
 
 Here is Example:
 
-```asm
+```bash
    0x0000000000001175 <+0>:     push   rbp
    0x0000000000001176 <+1>:     mov    rbp,rsp
    0x0000000000001179 <+4>:     add    rsp,0xffffffffffffff80
@@ -210,7 +206,7 @@ If an attacker wants to redirect a pointer to another location on the same page,
 
 It is important to note that this method of bypassing ASLR is only effective if the attacker can control the two least significant bytes of a pointer. In other cases, a more extensive brute-force search may be required to find a valid address. Additionally, this method may not be effective if the target program uses other security measures, such as stack canaries or non-executable stacks, to defend against memory corruption attacks.
 
->[!Note]
+> 💡 **Note:**
 >The Brute-Force technique works in netwrok based application and it can work in android since all the processes in android are spawned throug the single main process
 
 Further Reading : 

@@ -1,9 +1,9 @@
-<hr>
+ 
 Assembly language is a symbolic representation of the machine code that a computer can understand and execute.
 
 In assembly language, instructions are represented using mnemonic codes, which are easier for humans to read and understand than the numeric machine code. For example, the machine code for the instruction to add two numbers might be "01010101," while the corresponding assembly language instruction might be "ADD."
 
-<hr>
+ 
 
 ## Registers
 
@@ -14,7 +14,7 @@ Several general purpose registers:
     #### Register Partial Access
 Registers can be accessed partially, meaning that you can access the least significant bytes or most significant bytes of a word in a register. This can be useful for setting specific bits, or for reading and writing data from certain areas of the register.
 
-Accessing eax will sign-extend out the rest of rax. Other partial access preserve untouched parts of the register.  ![Image [1](../images/Capture1.png)
+Accessing eax will sign-extend out the rest of rax. Other partial access preserve untouched parts of the register.  ![Image ![Image 1](../images/Capture1.png)
 
 #### All partial accesses on amd64
 

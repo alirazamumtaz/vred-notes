@@ -11,7 +11,7 @@ Further Read for the Meltdown : https://meltdownattack.com/
 
 In a normal operation, the kernel and user-level programs share the same memory space, which allows for better performance, but also makes it easier for a malicious program to access sensitive information in the kernel's memory.
 
-![Image 1](Pasted-image-20230127232040.png)
+![Image 1](../images/Pasted-image-20230127232040.png)
 
 **Read Further about Process address space and Virtual Memory Mapping**
 - [1. Process in Linux](1.%20Process%20in%20Linux.md)
@@ -23,7 +23,7 @@ In the Intel processor, the MMU (Memory Management Unit) uses a register called 
 
 In Linux kernel, the page directory for each process is stored in a data structure called `mm_struct`. The `mm_struct` data structure contains a field called `pgd` that stores the physical address of the page directory for the process.
 
->[!Note]
+> 💡 **Note:**
 >`task_struct` contains `mm_struct` so order is `task_struct->mm_struct->pgd`
 
 

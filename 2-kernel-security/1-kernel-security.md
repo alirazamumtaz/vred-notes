@@ -11,7 +11,7 @@ Consider Pakistan-Centric View, In this context, individual processes can be tho
 
 Kernel Manages Resources between processes. The Kernel determines whether code can access these resources based on the privileges granted to the process running the code. The kernel controls access to these resources and grants permission to processes as needed. For example, a process may need to request access to a hardware peripheral through the kernel, which will then determine whether to allow the access based on the privileges of the process and the availability of the resource.
 
->[!info]
+> 💡
 >Granting permission here means kernel perform the task asked by user process. Such as reading the bytes from the file via read syscall
 
 But few Resources are only available to kernel and
@@ -43,7 +43,7 @@ A more modern solution is to use a special privilege level known as hypervisor m
 
 This allows the VM kernel to operate in a more isolated environment, while still providing the necessary resources and support for the guest operating system to function. It also helps to improve security by limiting the access of the VM kernel to sensitive system resources and preventing it from potentially damaging the host operating system or other VMs running on the same physical machine.
 
->[!Note]
+> 💡 **Note:**
 >The Ring system is true for "amd64" architecture and may not be true for others.
 
 
@@ -73,7 +73,7 @@ This is necessary because drivers are responsible for interacting with hardware 
 
 It's also worth noting that the concept of privilege levels and rings is not specific to Linux; it is a general feature of modern operating systems that is used to control access to resources and protect the system from unauthorized access or misuse. In other operating systems, the names and specific details of these privilege levels may vary, but the basic concept is similar.
 
-![Image 2](Pasted-image-20221228194602.png)
+![Image 2](../images/Pasted-image-20221228194602.png)
 
 ### Switching between rings 
 
@@ -152,7 +152,7 @@ As a result, modern kernels generally do not allow kernel modules to modify the 
 
 Theoretically it is possible for a kernel module to register an interrupt handler by using the LIDT (Load Interrupt Descriptor Table) and LGDT (Load Global Descriptor Table) instructions, and to be triggered by an interrupt instruction, such as int 3 or int 1. 
 
->[!info]
+> 💡
 >Interrupts are signals that are sent to the processor to request immediate attention, and can be used to perform various types of processing or to handle exceptions or other events.
 
 One-byte interrupt instructions, such as int 3 (0xcc) and int 1 (0xf1), can be useful for hooking because they can be easily placed in code to trigger an interrupt without consuming a lot of space. Int 3 is normally used to cause a SIGTRAP signal, which is used for debugging purposes, but it can be hooked by a kernel module to perform other actions. Int 1 is normally used for hardware debugging, but it can also be hooked by a kernel module.
@@ -243,7 +243,7 @@ Another data structure that is often used to store information about process pri
 
 Together, `struct task_struct` and `struct cred` are used by the kernel to track the privileges and other data of every running process. This information is used by the kernel to manage and schedule processes effectively, and to ensure that each process is only able to access the resources and perform the actions that it is allowed to.
 
->[!Note]
+> 💡 **Note:**
 >**struct cred** is member of struct **task_struct** 
 
 ```c
@@ -303,7 +303,7 @@ The `prepare_kernel_cred` function is used to create a new set of credentials th
 These functions are typically used when a kernel module or driver needs to change the privileges of a process, or when a user program needs to escalate its privileges in order to perform certain actions. 
 Inshort, when we have control all we have to run is `commit_cred(prepare_kernel_cred(0));
 
->[!Note]
+> 💡 **Note:**
 >We might face few complications How do we know where commit_creds and prepare_kernel_cred are in memory?
 >
 
@@ -324,7 +324,7 @@ TIF_SECCOMP is a flag in the `flags` bit field of the `thread_info` structure in
 To escape seccomp, we just need to do (in KERNEL space): `current_task_struct->thread_info.flags &= ~(1 << TIF_SECCOMP)` How do we get the current_task_struct? We're in luck! The kernel points the segment register gs to the current task struct. In kernel development, there is a shorthand macro for this: current The plan: Access current->thread_info.flags via the gs register. Clear the TIF_SECCOMP flag. Get the flag!!! 
 **Caveat: our children will still be seccomped (that's stored elsewhere)**
 
->[!info]
+> 💡
 >Since the `task_struct` is very important data structure and is required most of the time the gs segment register is always pointing towards it.
 
 ### Memory Management By Kernel
@@ -367,13 +367,13 @@ One advantage of this system is that it is easy for the operating system to trac
 
 But what if process needs more than 4KB memory ?
 
-![Image 5](Pasted-image-20230102035952.png)
+![Image 5](../images/Pasted-image-20230102035952.png)
 
 In a virtual memory system, the physical position of contiguous virtual pages (i.e., a group of consecutive pages in the virtual address space of a process) can be non-contiguous in physical memory. This means that the physical pages that are used to store the virtual pages may not be located next to each other in RAM.
 
 To manage this, the operating system typically keeps track of the physical base address of each page of virtual memory. This allows it to map the virtual addresses used by the process to the correct physical addresses in RAM.
 
-![Image 6](Pasted-image-20230102040245.png)
+![Image 6](../images/Pasted-image-20230102040245.png)
 
 So, how exactly this physical base address for each page can be tracked ? In order to address this sometime way back in hisotry someone came up with idea of the Page Table.
 
@@ -383,7 +383,7 @@ A page table is a data structure that is used to store the mappings between virt
 
 Traditionally, page tables were organized as an array of entries, with each entry containing the mapping for a single page of virtual memory. The size of the page table and the number of entries it contained were determined by the size of the virtual address space and the size of the pages used by the system. For example, if the virtual address space was 2MB and the page size was 4KB, the page table would contain 512 entries, each mapping a 4KB page of virtual memory to a corresponding page of physical memory.
 
-![Image 7](Pasted-image-20230103184701.png)
+![Image 7](../images/Pasted-image-20230103184701.png)
 
 However, this system has some limitations when it comes to managing non-contiguous virtual memory and very large virtual address spaces. For example, if the virtual address space of a process is larger than 2MB, the page table may not be able to hold enough entries to map all of the virtual pages. Similarly, if the virtual memory is non-contiguous (i.e., if the pages are not located next to each other in the virtual address space), it may be difficult to represent this using a simple array of page table entries. The Solution to these problems were solved by introducing the mullti-level paging system
 
@@ -395,7 +395,7 @@ The top level of the paging structure is called the page directory, and it conta
 
 Using this multi-level paging structure, it is possible to map a large virtual address space (up to 1GB) to physical memory. For example, if each page table contains 512 entries and each page is 4KB in size, the paging structure can map up to 2MB of virtual memory (512 entries * 4KB per entry = 2MB). If the page directory contains 512 PDEs, and each PDE refers to a page table that maps 2MB of virtual memory, the page directory can map a total of 1GB of virtual memory (512 entries * 2MB per entry = 1GB).
 
-![Image 8](Pasted-image-20230103185140.png)
+![Image 8](../images/Pasted-image-20230103185140.png)
 
 There is some overhead associated with using a multi-level paging structure, as each level of the paging structure consumes some memory to store the data structures and the mappings. For example, the page directory itself consumes 0x1000 bytes of memory, and each page table consumes 0x1000 bytes of memory for each 2MB of virtual memory that it maps.
 
@@ -409,7 +409,7 @@ Using this structure, it is possible to map a virtual address space of up to 512
 
 There is some overhead associated with using a PDPT, as it consumes 0x1000 bytes of memory to store the data structure and the pointers to the page directories. In addition, each page directory consumes 0x1000 bytes of memory to store the data structure and the PDEs.
 
-![Image 9](Pasted-image-20230103185607.png)
+![Image 9](../images/Pasted-image-20230103185607.png)
 
 To reduce this overhead, it is possible to set a special flag in a PDP to indicate that it should refer directly to a 1GB region of physical memory, rather than to a page directory. This can reduce the overhead of the paging structure, but it also limits the ability of the operating system to fine-tune the mappings between virtual and physical memory. But what if we need more than 512 GB ?
 
@@ -417,7 +417,7 @@ To reduce this overhead, it is possible to set a special flag in a PDP to indica
 
 In modern virtual memory systems, it is possible to use four levels of paging to map a very large virtual address space to physical memory. The top level of the paging structure is called the page map level 4 (PML4), and it contains page directory page table pointers (PDPTPs). Each PDPTP in the PML4 points to a page directory page table (PDPT), which in turn contains page directory pointers (PDPs) that point to page directories. Each page directory contains page directory entries (PDEs) that map to page tables, and each page table contains page table entries (PTEs) that map to pages of physical memory.
 
-![Image 10](Pasted-image-20230103202107.png)
+![Image 10](../images/Pasted-image-20230103202107.png)
 
 Using this four-level paging structure, it is possible to map a virtual address space of up to 256TB of memory. For example, if each PDPT contains 512 PDPs, and each PDP maps to a page directory that contains 512 PDEs, which in turn map to page tables that map 2MB of virtual memory each, the PML4 can map a total of 256TB of virtual memory (512 PML4 entries * 512 PDPT entries * 512 PDP entries * 512 PDE entries * 2MB per PDE = 256TB).
 
@@ -431,7 +431,7 @@ The number 0x7fff47d4c123 is a hexadecimal representation of a memory address th
 
 A B C D E F
 
-![Image 11](Pasted-image-20230103205302.png)
+![Image 11](../images/Pasted-image-20230103205302.png)
 
 In a virtual memory system with a four-level paging structure, each of these fields corresponds to a different level of the paging structure. The fields are used to index into the paging data structures to determine the physical memory address that is mapped to the virtual memory address.
 
@@ -463,7 +463,7 @@ The EPT consists of multiple levels of data structures, similar to a four-level 
 
 In this way, the EPT acts as an additional layer of address translation, allowing the VMs to access "physical" memory as if they had full access to the host machine's physical memory. However, in reality, each "physical" memory access is translated through the EPT, which ensures that the VMs are isolated from each other and that they do not interfere with the operation of the other VMs.
 
-![Image 12](Pasted-image-20230104202801.png)
+![Image 12](../images/Pasted-image-20230104202801.png)
 
 Read : [https://rayanfam.com/topics/hypervisor-from-scratch-part-4](https://rayanfam.com/topics/hypervisor-from-scratch-part-4/)
 

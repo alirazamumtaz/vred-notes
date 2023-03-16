@@ -86,7 +86,7 @@ Here is an example of basic shellcode that can spawn a shell.
 
   
 
-```x86asm
+```asm
 
 mov rax, 59 # this is the syscall number of execve
 
@@ -130,7 +130,7 @@ We can also intersperse arbitrary data in your shellcode:
 
   
 
-```x86asm
+```asm
 
 .byte 0x48, 0x45, 0x4C, 0x4C, 0x4F # "HELLO"
 
@@ -144,7 +144,7 @@ Other ways to embed data:
 
   
 
-```x86asm
+```asm
 
 mov rbx, 0x0068732f6e69622f # move "/bin/sh\0" into rbx
 
@@ -177,7 +177,7 @@ A little-endian system, in contrast, stores the least-significant byte of a word
 
 Let us store a 8 byte number 0x1122334455667788 in memory.
 
-![Image 1](Pasted-image-20221229224021.png)
+![Image 1](../images/Pasted-image-20221229224021.png)
 
   
 
@@ -189,7 +189,7 @@ For example:
 
   
 
-```x86asm
+```asm
 
 mov rbx, 0x0068732f6e69622f # move "/bin/sh\0" into rbx
 
@@ -201,7 +201,7 @@ This code will work on a big-endian system, but on a little-endian system it wil
 
   
 
-```x86asm
+```asm
 
 mov rbx, 0x2f62696e2f
 
@@ -215,7 +215,7 @@ We can write a shellcode that can do many things other than just spawning a shel
 
   
 
-```x86asm
+```asm
 
 mov rbx, 0x00000067616c662f # push "/flag" filename
 
@@ -253,7 +253,7 @@ Similarly, we can write a shellcode that can change the permissions of a file. F
 
   
 
-```x86asm
+```asm
 
 mov rbx, 0x00000067616c662f # push "/flag" filename
 
@@ -400,9 +400,6 @@ Similarly, we can run cross-architecture shellcode with an emulator:
 
 ### Common Challenges
 
-<<<<<<< Updated upstream
-  
-
 Well, that is very easy to write a normal shellcode that can simply run and make your defined task done. But that's not the end. The security researchers made our life difficult by adding different filters on data, more specifically on shellcode. That means we have to design our shellcode in such a way that it passes through the filters.
 
 Let's discuss some common filters that may occur to prevent your code execution.
@@ -458,7 +455,7 @@ For instance, we can write a shellcode that avoids those forbidden bytes like:
 
 If the constraints on your shellcode are too hard to get around with clever synonyms, but the page where your shellcode is mapped is writable, you can use a technique called *code == data* to bypass the filter. For example, if we are restricted to use `0xcc` byte that is trap instruction `int3`, we can use the following technique to bypass the filter:
 
-```x86asm
+```asm
 
 inc BYTE PTR [rip]
 
@@ -470,8 +467,7 @@ This will increment the byte at the address of the next instruction, which is th
 
   
 
->[!NOTE]
-
+> 💡 **Note:**
 >When testing this, you'll need to make sure .text is writable:
 
 > `gcc -Wl,-N --static -nostdlib -o test test.s`
@@ -508,7 +504,7 @@ A good stage-1 shellcode is very short and simple. That's because we can load mo
 
   
 
->[!info]
+> 💡
 > The downside here is we don't always have access to inject more shellcode.
 > 
 > So we can use a technique called *shellcode chaining* to bypass this limitation. This is a technique where we use a stage-1 shellcode to load a stage-2 shellcode, and then use the stage-2 shellcode to load a stage-3 shellcode, and so on. This is a very powerful technique that can be used to bypass many filters.
@@ -534,4 +530,4 @@ Well, we have learned a lot about shellcode. But we can't use it in today's worl
 	Well, there are a lot more filters that can be used to prevent your shellcode execution. But we can't discuss all of them here. So, I'll leave it to you to explore more about them.
 	
 - #### Forbidden Bytes
-	  Depending on the injection method, certain bytes might not be allowed. For example, if we are injecting shellcode into a binary, we might not be able to use null bytes. Similarly, if we are injecting shellcode into a URL, we might not be able to use certain characters like `&` or `=`. Although We can use a tool like `msfvenom` to generate shellcode that avoids these forbidden bytes, but we can also write our own shellcode that avoids these forbidden bytes.
+	Depending on the injection method, certain bytes might not be allowed. For example, if we are injecting shellcode into a binary, we might not be able to use null bytes. Similarly, if we are injecting shellcode into a URL, we might not be able to use certain characters like `&` or `=`. Although We can use a tool like `msfvenom` to generate shellcode that avoids these forbidden bytes, but we can also write our own shellcode that avoids these forbidden bytes.

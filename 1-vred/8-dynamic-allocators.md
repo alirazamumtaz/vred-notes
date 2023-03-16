@@ -136,11 +136,11 @@ The metadata stored in the chunk includes information such as the size of the ch
 
 By keeping track of the "chunk_addr" internally, ptmalloc can efficiently manage and reuse memory chunks without needing to traverse the entire heap to find a suitable block of memory.
 
-![Image 1](Pasted-image-20230124014310.png)
+![Image 1](../images/Pasted-image-20230124014310.png)
 
 To conserve memory, the ptmalloc memory allocator uses the 'prev_size' field of a chunk for the previous chunk when the 'PREV_INUSE' flag of the chunk is set, which indicates that the previous chunk is not free.
 
-![Image 2](Pasted-image-20230124014520.png)
+![Image 2](../images/Pasted-image-20230124014520.png)
 
 #### Free Chunk Meta-Data
 
@@ -161,7 +161,7 @@ Each freed chunk in the thread-local cache has two pointers associated with it:
 
 2.  A pointer to the per-thread struct: Each thread has its own `tcache_perthread_struct` struct, which keeps track of the thread-local cache. Each freed chunk in the thread-local cache has a pointer to the per-thread struct that created it. This pointer is used to check if a chunk has already been freed in order to detect double-free bugs, and also for other bookkeeping tasks.
    
-![Image 3](Pasted-image-20230124015148.png)
+![Image 3](../images/Pasted-image-20230124015148.png)
 
 ###### Largebin Free Chunk
 
@@ -182,7 +182,7 @@ These pointers allow the ptmalloc memory allocator to efficiently manage the lar
 It's worth noting that large bin chunks are not used for thread local caching unlike small chunks, as they are usually larger and caching them is not necessary. Also, Large bin chunks are also not used for small allocations, as the size of the chunks in the large bin is larger than the requested size.
 
 
-![Image 4](Pasted-image-20230124015349.png)
+![Image 4](../images/Pasted-image-20230124015349.png)
 
 ### The Unlink Attack
 
@@ -190,7 +190,7 @@ When a chunk of memory that is larger than the maximum size of the thread-local 
 
 ### Poison Null Bytes
 
-![Image 4](Pasted-image-20230124020337.png)
+![Image 4](../images/Pasted-image-20230124020337.png)
 
 ### House of Spirit
 
