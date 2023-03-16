@@ -14,8 +14,8 @@ In a normal operation, the kernel and user-level programs share the same memory 
 ![Image 1](../images/Pasted-image-20230127232040.png)
 
 **Read Further about Process address space and Virtual Memory Mapping**
-- [1. Process in Linux](1.%20Process%20in%20Linux.md)
-- [1. Kernel Security](1.%20Kernel%20Security.md)
+- [1. Process in Linux](../1-vred/1-process-in-linux.md)
+- [1. Kernel Security](../2-kernel-security/1-kernel-security.md)
   
 In KPTI, there are two sets of page tables, one for user-mode and one for kernel-mode. These two sets of page tables are used to map the virtual memory addresses to physical memory addresses. The kernel-mode page table has full access to both kernel and user memory, while the user-mode page table has limited access to the kernel memory. In order to achieve this, the kernel pages are marked as non-executable in user copy.
 
